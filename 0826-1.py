@@ -80,7 +80,9 @@ class Connect(object):
         dataformat = {
             "customerGradeId": status,
             "offset": offset,
-            "limit": limit
+            "limit": limit,
+            "registerStartTime": "2019-07-01",
+            "registerEndTime": "2019-09-01"
         }
 
         try:
@@ -154,71 +156,8 @@ class Connect(object):
         # userdic['贷款编号'] = content['loanAppId']
         return userdic
 
-    def reqLaninfo(self, contractNo):
-        dataformat = {
-            "customerId": contractNo
-        }
-        data = urllib.parse.urlencode(dataformat)
-        baseurl = self.loadUrl + data
-        request = urllib.request.Request(url=baseurl, method='GET',
-                                         headers=self.headers)
-        loanlist = []
-        userdic = {}
-        # print(request.full_url)
-        response = self.opener.open(request)
-        contentb = str(response.read(), encoding='utf-8')
-        if contentb:
-            content = json.loads(contentb, strict=False)
-            response.close()
-            for i in content:
-                userdic['放款-贷款金额'] = i['issueAmount']
-                userdic['放款-贷款编号'] = i['loanAppId']
-                userdic['放款-创建时间'] = i['createTime']
-                userdic['银行卡状态'] = i['verifyStatus']['value']
-                loanlist.append(userdic)
-        else:
-            userdic['放款-贷款金额'] = ''
-            userdic['放款-贷款编号'] = ''
-            userdic['银行卡状态'] = ''
-            userdic['放款-创建时间'] = ''
-            loanlist.append(userdic)
-        return loanlist
 
-    def repayinfo(self, contractNo):
-        dataformat = {
-            "customerId": contractNo
-        }
-        data = urllib.parse.urlencode(dataformat)
-        baseurl = self.realpayUrl + data
-        request = urllib.request.Request(url=baseurl, method='GET',
-                                         headers=self.headers)
-        repaylist = []
-        userdic = {}
-        # print(request.full_url)
-        response = self.opener.open(request)
-        contentb = str(response.read(), encoding='utf-8')
-        if contentb:
-            content = json.loads(contentb, strict=False)
-            response.close()
-            for i in content:
-                userdic['还款-贷款金额'] = i['depositAmount']
-                userdic['还款-贷款编号'] = i['loanAppId']
-                userdic['还款金额'] = i['depositAmount']
-                userdic['还款创建时间'] = i['createTime']
-                userdic['还款状态'] = i['depositStatus']['value']
-                repaylist.append(userdic)
-        else:
-            userdic['还款-贷款金额'] = ''
-            userdic['还款-贷款编号'] = ''
-            userdic['还款金额'] = ''
-            userdic['还款创建时间'] = ''
-            userdic['还款状态'] = ''
-            repaylist.append(userdic)
-        return repaylist
-
-    def userInfo(self, contactList, filename, filename2, stats):
-        userinfo = []
-        relpay = []
+    def userInfo(self, contactList, filename,  stats):
         loanlist = []
         contact_list = contactList
         faillist = []
@@ -231,20 +170,10 @@ class Connect(object):
                     baseuser = basereq.reqUserinfo(i)
                     baseuser2 = basereq.reqBaseinfo(i)
                     baseuser.update(baseuser2)
-                    paydic = {}
-                    paydic['用户等级'] = stats
-                    paydic.update(baseuser)
                     loandic = {}
                     loandic['用户等级'] = stats
                     loandic.update(baseuser)
-                    relpayinfo = basereq.repayinfo(i)
-                    loaninfo = basereq.reqLaninfo(i)
-                    for pay in relpayinfo:
-                        paydic.update(pay)
-                        relpay.append(paydic)
-                    for loan in loaninfo:
-                        loandic.update(loan)
-                        loanlist.append(loandic)
+                    loanlist.append(loandic)
                     if i in faillist:
                         faillist.remove(i)
                     if i in contact_list:
@@ -260,44 +189,33 @@ class Connect(object):
                 print(e)
         # print(offset, userinfo)
         with open(filename, 'a', newline='') as f:
-            head = ['用户等级', '姓名', '手机号', '用户编号', '注册时间', '身份证号', '放款-贷款编号', '放款-贷款金额', '银行卡状态','放款-创建时间']
+            head = ['用户等级', '姓名', '手机号', '用户编号', '注册时间', '身份证号']
             writer = csv.DictWriter(f, head)
             for item in loanlist:
-                writer.writerow(item)
-            f.close()
-        with open(filename2, 'a', newline='') as f:
-            head = ['用户等级', '姓名', '手机号', '用户编号', '注册时间', '身份证号', '还款-贷款编号', '还款-贷款金额', '还款金额','还款创建时间', '还款状态']
-            writer = csv.DictWriter(f, head)
-            for item in relpay:
                 writer.writerow(item)
             f.close()
 
     def action(self, stats, limit):
         now = datetime.datetime.now()
         format = "%Y-%m-%d-%H-%M-%S"
-        filename = 'loan' + now.strftime(format) + '.csv'
+        filename = 'userinfo' + now.strftime(format) + '.csv'
         with open(filename, 'w') as f:
-            head = ['用户等级', '姓名', '手机号', '用户编号', '注册时间', '身份证号', '放款-贷款编号', '放款-贷款金额', '银行卡状态','放款-创建时间']
-            writer = csv.DictWriter(f, head)
-            writer.writeheader()
-        filename2 = 'repay' + now.strftime(format) + '.csv'
-        with open(filename2, 'w') as f:
-            head = ['用户等级', '姓名', '手机号', '用户编号', '注册时间', '身份证号', '还款-贷款编号', '还款-贷款金额', '还款金额','还款创建时间','还款状态']
+            head = ['用户等级', '姓名', '手机号', '用户编号', '注册时间', '身份证号']
             writer = csv.DictWriter(f, head)
             writer.writeheader()
         # basereq.headers['Cookie'] = sys.argv[1]
         baseinfo = basereq.reqbase(0, 10, stats)
         print(baseinfo)
-        # offset = baseinfo['offset'] + limit
-        offset=307200
+        offset = baseinfo['offset'] + limit
+        # offset=307200
         totalCount = baseinfo['totalCount']
         # totalCount = 30
         contact_list = baseinfo['list']
-        basereq.userInfo(contact_list, filename, filename2, stats)
+        basereq.userInfo(contact_list, filename, stats)
         while offset <= totalCount:
             baseinfo = basereq.reqbase(offset, limit, stats)
             contact_list = baseinfo['list']
-            basereq.userInfo(contact_list, filename, filename2, stats)
+            basereq.userInfo(contact_list, filename,  stats)
             offset = offset + limit
 
 
@@ -313,12 +231,13 @@ if __name__ == '__main__':
         userdataf['password'] = input('输入密码： ')
     basereq.loginaction(userdataf)
     threadlist = []
-    # basereq.action(1,10)
-    for i in [2, 3, 4, 5]:
-        t = threading.Thread(target=basereq.action, args=(i, 10,))
-        # t = Process(target=basereq.action, args=(i, 10,))
-        threadlist.append(t)
-    for i in threadlist:
-        i.setDaemon(True)
-        i.start()
-    i.join()
+    # basereq.action(1,200)
+    for i in [1,2, 3, 4, 5]:
+        basereq.action(i, 200)
+    #     t = threading.Thread(target=basereq.action, args=(i, 200,))
+    #     # t = Process(target=basereq.action, args=(i, 10,))
+    #     threadlist.append(t)
+    # for i in threadlist:
+    #     i.setDaemon(True)
+    #     i.start()
+    # i.join()
