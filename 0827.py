@@ -81,8 +81,8 @@ class Connect(object):
         dataf = {
             "offset": offset,
             "limit": limit,
-            "StartTime": "2019-07-01",
-            "EndTime": "2019-09-01"
+            "startTime": "2019-07-01",
+            "endTime": "2019-09-01"
         }
         data = urllib.parse.urlencode(dataf)
         url = self.loanurl + data
@@ -102,8 +102,8 @@ class Connect(object):
         dataf = {
             "offset": offset,
             "limit": limit,
-            "StartTime": "2019-07-01",
-            "EndTime": "2019-09-01"
+            "startTime": "2019-07-01",
+            "endTime": "2019-09-01"
         }
         data = urllib.parse.urlencode(dataf)
         url = self.payurl + data
@@ -120,12 +120,12 @@ class Connect(object):
 
     def loanaction(self, offset, limit, filename):
         faillist = 0
-        loandic = {}
         loanlist = []
         try:
             print(offset)
             baseinfo = basereq.loaninfo(offset, limit)
             for i in baseinfo['list']:
+                loandic = {}
                 loandic['用户编号'] = i['customerId']
                 loandic['放款编号'] = i['issueAmount']
                 loandic['贷款编号'] = i['loanAppId']
@@ -156,11 +156,11 @@ class Connect(object):
 
     def payaction(self, offset, limit, filename):
         faillist = 0
-        paydic = {}
         paylist = []
         try:
             baseinfo2 = basereq.payinfo(offset, limit)
             for i in baseinfo2['list']:
+                paydic = {}
                 paydic['用户编号'] = i['customerId']
                 paydic['还款编号'] = i['orderNo']
                 paydic['贷款编号'] = i['loanAppId']
@@ -239,18 +239,20 @@ class Connect(object):
         while offset <= totalCount:
             print('offset:', offset)
             # Connect.loanaction(offset, limit, totalCount, filename)
-            # t = threading.Thread(target=basereq.payaction, args=(offset, limit, filename,))
-            basereq.loanaction(offset, limit, filename)
+            t = threading.Thread(target=basereq.payaction, args=(offset, limit, filename,))
+            # t = Process(target=basereq.payaction, args=(offset, limit, filename,))
+            # basereq.loanaction(offset, limit, filename)
             offset = offset + limit
-        #     threadlist.append(t)
-        # n = 0
-        # for i in threadlist:
-        #     i.setDaemon(True)
-        #     i.start()
-        #     if n <= 10:
-        #         i.join()
-        #         n = 0
-        #     n = n + 1
+            threadlist.append(t)
+        n = 0
+        for i in threadlist:
+            i.setDaemon(True)
+            i.start()
+            if n > 10:
+                i.join()
+                n = 0
+            n = n + 1
+        i.join()
 
 if __name__ == '__main__':
     basereq = Connect()
