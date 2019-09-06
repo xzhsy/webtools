@@ -27,6 +27,6 @@ for i in threadlist:
         i.join()
         c1=0
         print('c1:',c1)
-        time.sleep(10)
+        # time.sleep(10)
     c1 += 1
 i.join()

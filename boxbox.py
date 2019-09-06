@@ -31,20 +31,13 @@ class Connect(object):
         }
         # 定义请求连接
         self.dueurl = 'https://adminweb.adminrichboxbox.com/api/api/collection/current-loan?'
-        self.userUrl = 'https://adminweb.adminrichboxbox.com/api/api/review/personalInfo?'
-        # self.basicUrl = 'http://149.129.222.131:9999/api/api/customer/load-basic-info?'
-        # self.realpayUrl = 'http://149.129.222.131:9999/api/api/finance/customer/deposit-history?'
-        # self.loadUrl = 'http://149.129.222.131:9999/api/api/finance/customer/issue-history?'
+        self.userurl = 'https://adminweb.adminrichboxbox.com/api/api/review/personalInfo?'
+        self.overdueurl = 'https://adminweb.adminrichboxbox.com/api/api/collection/overdue-loan?'
 
         # 验证码连接
         self.catpch = 'https://adminweb.adminrichboxbox.com/api/auth/captcha?width=120&height=50&serialId=KY1uqphQ'
         self.login = 'https://adminweb.adminrichboxbox.com/api/auth/login'
-        # self.baseurl='https://adminweb.adminrichboxbox.com/api/api/collection/my?'
-        # self.userUrl='https://adminweb.adminrichboxbox.com/api/api/review/personalInfo?'
-        # self.loadUrl='https://adminweb.adminrichboxbox.com/api/api/collection/collection-loan-detail?'
-        # #验证码连接
-        # self.catpch='https://adminweb.adminrichboxbox.com/api/auth/captcha?width=120&height=50&serialId=KY1uqphQ'
-        # self.login = 'https://adminweb.adminrichboxbox.com/api/auth/login'
+
 
     def loginaction(self, userdataf):
         try:
@@ -64,12 +57,10 @@ class Connect(object):
     def loaninfo(self, offset, limit):
         dataf = {
             "offset": offset,
-            "limit": limit,
-            "startTime": "2019-07-01",
-            "endTime": "2019-09-01"
+            "limit": limit
         }
         data = urllib.parse.urlencode(dataf)
-        url = self.loanurl + data
+        url = self.dueurl + data
         request = urllib.request.Request(url=url, method='GET')
         print(request.get_full_url())
         response = self.opener.open(request)
@@ -82,15 +73,30 @@ class Connect(object):
         infodic['list'] = content['item']
         return infodic
 
-    def payinfo(self, offset, limit):
+    def personinfo(self,contractNo):
         dataf = {
-            "offset": offset,
-            "limit": limit,
-            "startTime": "2019-07-01",
-            "endTime": "2019-09-01"
+            "contractNo":contractNo
         }
         data = urllib.parse.urlencode(dataf)
-        url = self.payurl + data
+        url = self.userurl + data
+        request = urllib.request.Request(url=url, method='GET')
+        response = self.opener.open(request)
+        contentb = str(response.read(), encoding='utf-8')
+        content = json.loads(contentb, strict=False)
+        response.close()
+        personinfo = {}
+        personinfo['手机号2'] = content['mobile']
+        personinfo['身份证号'] = content['credentialNo']
+        personinfo['whatsappid'] = content['whatsappId']
+        return personinfo
+
+    def overdueinfo(self, offset, limit):
+        dataf = {
+            "offset": offset,
+            "limit": limit
+        }
+        data = urllib.parse.urlencode(dataf)
+        url = self.overdueurl + data
         request = urllib.request.Request(url=url, method='GET')
         response = self.opener.open(request)
         contentb = str(response.read(), encoding='utf-8')
@@ -103,129 +109,110 @@ class Connect(object):
         return infodic
 
     def loanaction(self, offset, limit, filename):
-        faillist = 0
+        faillist = []
         loanlist = []
         try:
             print(offset)
             baseinfo = basereq.loaninfo(offset, limit)
             for i in baseinfo['list']:
                 loandic = {}
-                loandic['用户编号'] = i['customerId']
-                loandic['放款编号'] = i['issueAmount']
                 loandic['贷款编号'] = i['loanAppId']
-                loandic['贷款状态'] = i['loanStatus']['value']
                 loandic['用户姓名'] = i['realName']
-                loandic['手机'] = i['mobile']
-                loandic['放款状态'] = i['loanIssueStatus']['value']
-                loandic['放款金额'] = i['issueAmount']
-                loandic['支付公司流水号'] = i['outTransactionId']
-                loandic['放款渠道'] = i['disbursementMethod']
-                loandic['银行卡号'] = i['bankcardNo']
-                loandic['客户银行卡分行名称'] = i['bankCode']
-                loandic['已验证的银行卡用户名'] = i['verifyAccountHolderName']
-                loandic['银行名'] = i['bankcardAccountNo']
-                loandic['银行卡验证状态'] = i['verifyStatus']['value']
-                loandic['创建时间'] = i['createTime']
+                loandic['手机号1'] = i['mobile']
+                loandic['放款时间'] = i['issueDate']
+                loandic['还款时间'] = i['dueDate']
+                loandic['应还金额'] = i['dueAmount']
+                loandic['放款金额'] = i['amount']
+                loandic['贷款期限'] = i['duration']
+                loandic['贷款类型'] = i['loanType']['value']
+                contractNo=i['contractNo']
+                perdic = basereq.personinfo(contractNo)
+                loandic.update(perdic)
                 loanlist.append(loandic)
         except Exception as e:
-            faillist = offset
+            faillist.append(offset)
             print(e)
         with open(filename, 'a', newline='') as f:
-            head = ['用户编号', '放款编号', '贷款编号', '贷款状态', '用户姓名', '手机', '放款状态', '放款金额', '支付公司流水号', '放款渠道', '银行卡号',
-                    '客户银行卡分行名称', '已验证的银行卡用户名', '银行名', '银行卡验证状态', '创建时间']
+            head = ['用户编号', '贷款编号', '用户姓名', '手机号1', '手机号2','身份证号', 'whatsappid', '放款时间', '还款时间', '放款金额',
+                    '应还金额', '贷款类型', '贷款期限']
             writer = csv.DictWriter(f, head)
             for item in loanlist:
                 writer.writerow(item)
             f.close()
+        print(faillist)
 
-    def payaction(self, offset, limit, filename):
-        faillist = 0
-        paylist = []
+    def overdueaction(self, offset, limit, filename):
+        faillist = []
+        overduelist = []
         try:
-            baseinfo2 = basereq.payinfo(offset, limit)
-            for i in baseinfo2['list']:
-                paydic = {}
-                paydic['用户编号'] = i['customerId']
-                paydic['还款编号'] = i['orderNo']
-                paydic['贷款编号'] = i['loanAppId']
-                paydic['用户姓名'] = i['realName']
-                paydic['手机'] = i['mobile']
-                paydic['交易状态'] = i['depositStatus']['value']
-                paydic['还款码(VA)'] = i['paymentCode']
-                paydic['还款金额'] = i['depositAmount']
-                paydic['实收金额'] = i['arrivedAmount']
-                paydic['清算金额'] = i['clearedAmount']
-                paydic['支付公司流水号'] = i['outTransactionId']
-                paydic['支付渠道'] = i['depositChannel']
-                paydic['还款渠道'] = i['source']
-                paydic['还款码操作员'] = i['operator']
-                paydic['还款方式'] = i['depositMethod']
-                paydic['创建时间'] = i['createTime']
-                paydic['还款到账时间'] = i['reachedTime']
-                paylist.append(paydic)
+            print(offset)
+            baseinfo = basereq.overdueinfo(offset, limit)
+            for i in baseinfo['list']:
+                overdue = {}
+                overdue['贷款编号'] = i['loanAppId']
+                overdue['用户姓名'] = i['realName']
+                overdue['手机号'] = i['mobile']
+                overdue['放款时间'] = i['issueDate']
+                overdue['还款时间'] = i['dueDate']
+                overdue['逾期天数'] = i['overdueDays']
+                overduelist.append(overdue)
         except Exception as e:
+            faillist.append(offset)
             print(e)
         with open(filename, 'a', newline='') as f:
-            head = ['用户编号', '还款编号', '贷款编号', '用户姓名', '手机', '交易状态', '还款码(VA)', '还款金额', '实收金额', '清算金额', '支付公司流水号', '支付渠道',
-                    '还款渠道', '还款码操作员', '还款方式', '创建时间', '还款到账时间']
+            head = ['用户编号', '贷款编号', '用户姓名', '手机号', '放款时间', '还款时间', '逾期天数']
             writer = csv.DictWriter(f, head)
-            for item in paylist:
+            for item in overduelist:
                 writer.writerow(item)
             f.close()
+        print(faillist)
 
-    # def action(self, limit):
-    #     now = datetime.datetime.now()
-    #     format = "%Y-%m-%d-%H-%M-%S"
-    #     filename = 'loan' + now.strftime(format) + '.csv'
-    #     with open(filename, 'w') as f:
-    #         head = ['用户编号', '放款编号', '贷款编号', '贷款状态', '用户姓名', '手机', '放款状态', '放款金额', '支付公司流水号', '放款渠道', '银行卡号',
-    #                 '客户银行卡分行名称', '已验证的银行卡用户名', '银行名', '银行卡验证状态', '创建时间']
-    #         writer = csv.DictWriter(f, head)
-    #         writer.writeheader()
-    #
-    #
-    #     offset = 0
-    #     baseinfo = basereq.loaninfo(offset, 10)
-    #     # print(baseinfo)
-    #     totalCount = baseinfo['totalcount']
-    #     threadlist = []
-    #     while offset <= totalCount:
-    #         print('offset:', offset)
-    #         # Connect.loanaction(offset, limit, totalCount, filename)
-    #         t = threading.Thread(target=basereq.loanaction, args=(offset, limit, filename,))
-    #         # basereq.loanaction(offset, limit, filename)
-    #         offset = offset + limit
-    #         threadlist.append(t)
-    #     n = 0
-    #     for i in threadlist:
-    #         i.setDaemon(True)
-    #         i.start()
-    #         if n <= 10:
-    #             i.join()
-    #             n = 0
-    #         n = n + 1
     def action(self, limit):
         now = datetime.datetime.now()
         format = "%Y-%m-%d-%H-%M-%S"
-        filename = 'pay' + now.strftime(format) + '.csv'
+        filename = 'loan' + now.strftime(format) + '.csv'
+        head = ['贷款编号', '用户姓名', '手机号', '手机号2', '身份证号', 'whatsappid', '放款时间', '还款时间', '放款金额',
+                '应还金额', '贷款类型', '贷款期限']
         with open(filename, 'w') as f:
-            head = ['用户编号', '还款编号', '贷款编号', '用户姓名', '手机', '交易状态', '还款码(VA)', '还款金额', '实收金额', '清算金额', '支付公司流水号', '支付渠道',
-                    '还款渠道', '还款码操作员', '还款方式', '创建时间', '还款到账时间']
             writer = csv.DictWriter(f, head)
             writer.writeheader()
 
-
         offset = 0
-        baseinfo = basereq.payinfo(offset, 10)
+        baseinfo = basereq.loaninfo(offset, 10)
         # print(baseinfo)
         totalCount = baseinfo['totalcount']
         threadlist = []
         while offset <= totalCount:
             print('offset:', offset)
-            # Connect.loanaction(offset, limit, totalCount, filename)
-            t = threading.Thread(target=basereq.payaction, args=(offset, limit, filename,))
-            # t = Process(target=basereq.payaction, args=(offset, limit, filename,))
-            # basereq.loanaction(offset, limit, filename)
+            t = threading.Thread(target=basereq.loanaction, args=(offset, limit, filename,))
+            offset = offset + limit
+            threadlist.append(t)
+        n = 0
+        for i in threadlist:
+            i.setDaemon(True)
+            i.start()
+            if n > 10:
+                i.join()
+                n = 0
+            n = n + 1
+        i.join()
+
+    def dueaction(self, limit):
+        now = datetime.datetime.now()
+        format = "%Y-%m-%d-%H-%M-%S"
+        filename2 = 'overdue' + now.strftime(format) + '.csv'
+        head2 = ['用户编号', '贷款编号', '用户姓名', '手机号', '放款时间', '还款时间', '逾期天数']
+        with open(filename2, 'w') as f:
+            writer = csv.DictWriter(f, head2)
+            writer.writeheader()
+        offset = 0
+        baseinfo = basereq.overdueinfo(offset, 10)
+        # print(baseinfo)
+        totalCount = baseinfo['totalcount']
+        threadlist = []
+        while offset <= totalCount:
+            print('offset:', offset)
+            t = threading.Thread(target=basereq.overdueaction, args=(offset, limit, filename2,))
             offset = offset + limit
             threadlist.append(t)
         n = 0
@@ -248,14 +235,12 @@ if __name__ == '__main__':
         userdataf['mobile'] = input('输入用户名： ')
         userdataf['password'] = input('输入密码： ')
     basereq.loginaction(userdataf)
-    basereq.action(200)
-    # threadlist = []
-    #
-    # for i in [2, 3, 4, 5]:
-    #     t = threading.Thread(target=basereq.action, args=(i, 10,))
-    #     # t = Process(target=basereq.action, args=(i, 10,))
-    #     threadlist.append(t)
-    # for i in threadlist:
-    #     i.setDaemon(True)
-    #     i.start()
-    # i.join()
+    # basereq.action(200)
+    t1 = Process(target=basereq.action,args=(200,))
+    t2 = Process(target=basereq.dueaction,args=(200,))
+    t1.start()
+    t2.start()
+    t1.join()
+    t2.join()
+
+
