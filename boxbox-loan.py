@@ -13,7 +13,7 @@ socket.setdefaulttimeout(20)
 
 class Connect(object):
     def __init__(self):
-        # 自定义请求方法，获取cookie
+        # 自定义请求方法，获取cookie https://adminweb.adminrichboxbox.com/
         cookie_object = cookiejar.CookieJar()
         hanler = urllib.request.HTTPCookieProcessor(cookie_object)
         self.opener = urllib.request.build_opener(hanler)
@@ -24,7 +24,7 @@ class Connect(object):
             "Accept-Language": " en-US,en;q=0.5",
             "Accept-Encoding": " gzip, deflate, br",
             "Referer": " https://adminweb.adminrichboxbox.com/",
-            "X-ADMIN-TOKEN": " eyJsb2NhbGUiOiJ6aF9DTiIsImFsZyI6IkhTNTEyIn0.eyJzdWIiOiIwMTkiLCJleHAiOjE1Njc3NzQ2NjB9.ZgFNautR4sAHzy83gx_Tzz1Dz1oTg_9WUmGScI8mtQM278uC4rnjpXSD3LbIBlYg_F0aYjRdp6ZqLX-sehEwzw",
+            "X-ADMIN-TOKEN": "eyJsb2NhbGUiOiJ6aF9DTiIsImFsZyI6IkhTNTEyIn0.eyJzdWIiOiIwMTkiLCJleHAiOjE1Njg0NzE2MTJ9.SEaOIRsbtZHVAATXdCfkzrLw1CnDYJKv75ZB6_3qnM9O7hRt8cqYYXVXmQ1tIXzKKTPqIz8aPJEzFRuVKfBjmw",
             "Connection": " keep-alive",
             "Pragma": " no-cache",
             "Cache-Control": " no-cache"
@@ -37,24 +37,22 @@ class Connect(object):
         self.overdueurl = 'https://adminweb.adminrichboxbox.com/api/api/collection/overdue-loan?'
 
         # 验证码连接
-        self.catpch = 'https://adminweb.adminrichboxbox.com/api/auth/captcha?width=120&height=50&serialId=KY1uqphQ'
+        self.catpch = 'https://adminweb.adminrichboxbox.com/api/auth/captcha?width=120&height=50&serialId=8zfSz6LD'
         self.login = 'https://adminweb.adminrichboxbox.com/api/auth/login'
 
 
     def loginaction(self, userdataf):
-        try:
-            caprep = urllib.request.Request(self.catpch)
-            capponse = self.opener.open(caprep)
-            print(self.catpch)
-            SecretCode = input('输入验证码： ')
-            capponse.close()
-            userdataf['answer'] = SecretCode
-            userdata = urllib.parse.urlencode(userdataf).encode(encoding='UTF8')
-            login = urllib.request.Request(self.login, method='POST', data=userdata, headers=self.headers)
-            response = self.opener.open(login)
-            response.close()
-        except Exception as e:
-            print("登陆失败：", e)
+        caprep = urllib.request.Request(self.catpch)
+        capponse = self.opener.open(caprep)
+        print(self.catpch)
+        SecretCode = input('输入验证码： ')
+        capponse.close()
+        userdataf['answer'] = SecretCode
+        userdata = urllib.parse.urlencode(userdataf).encode(encoding='UTF8')
+        login = urllib.request.Request(self.login, method='POST', data=userdata, headers=self.headers)
+        response = self.opener.open(login)
+        response.close()
+
 
     def loaninfo(self, offset, limit):
         dataf = {
@@ -90,6 +88,7 @@ class Connect(object):
         personinfo['手机号2'] = content['mobile']
         personinfo['身份证号'] = content['credentialNo']
         personinfo['whatsappid'] = content['whatsappId']
+        personinfo['用户编号'] = content['customerId']
         return personinfo
 
     def overdueinfo(self, offset, limit):
@@ -122,11 +121,8 @@ class Connect(object):
                 loandic['用户姓名'] = i['realName']
                 loandic['手机号1'] = i['mobile']
                 loandic['放款时间'] = i['issueDate']
-                loandic['还款时间'] = i['dueDate']
-                loandic['应还金额'] = i['dueAmount']
-                loandic['放款金额'] = i['amount']
-                loandic['贷款期限'] = i['duration']
-                loandic['贷款类型'] = i['loanType']['value']
+                loandic['应还款时间'] = i['dueDate']
+                loandic['申请状态'] = i['loanAppStatus']['value']
                 contractNo=i['contractNo']
                 perdic = basereq.personinfo(contractNo)
                 loandic.update(perdic)
@@ -135,8 +131,7 @@ class Connect(object):
             faillist.append(offset)
             print(e)
         with open(filename, 'a', newline='') as f:
-            head = ['用户编号', '贷款编号', '用户姓名', '手机号1', '手机号2','身份证号', 'whatsappid', '放款时间', '还款时间', '放款金额',
-                    '应还金额', '贷款类型', '贷款期限']
+            head = ['用户编号', '贷款编号', '用户姓名', '手机号1', '手机号2','身份证号', 'whatsappid', '放款时间', '应还款时间', '申请状态']
             writer = csv.DictWriter(f, head)
             for item in loanlist:
                 writer.writerow(item)
@@ -153,28 +148,31 @@ class Connect(object):
                 overdue = {}
                 overdue['贷款编号'] = i['loanAppId']
                 overdue['用户姓名'] = i['realName']
-                overdue['手机号'] = i['mobile']
+                overdue['手机号1'] = i['mobile']
                 overdue['放款时间'] = i['issueDate']
-                overdue['还款时间'] = i['dueDate']
+                overdue['应还款时间'] = i['dueDate']
                 overdue['逾期天数'] = i['overdueDays']
+                overdue['申请状态'] = i['loanAppStatus']['value']
+                contractNo=i['contractNo']
+                perdic = basereq.personinfo(contractNo)
+                overdue.update(perdic)
                 overduelist.append(overdue)
         except Exception as e:
             faillist.append(offset)
             print(e)
         with open(filename, 'a', newline='') as f:
-            head = ['用户编号', '贷款编号', '用户姓名', '手机号', '放款时间', '还款时间', '逾期天数']
+            head = ['用户编号', '贷款编号', '用户姓名', '手机号1', '手机号2','身份证号', 'whatsappid','放款时间', '应还款时间', '逾期天数','申请状态']
             writer = csv.DictWriter(f, head)
             for item in overduelist:
                 writer.writerow(item)
             f.close()
         print(faillist)
 
-    def action(self, limit):
+    def action(self, limit,file):
         now = datetime.datetime.now()
         format = "%Y-%m-%d-%H-%M-%S"
-        filename = 'loan' + now.strftime(format) + '.csv'
-        head = ['贷款编号', '用户姓名', '手机号', '手机号2', '身份证号', 'whatsappid', '放款时间', '还款时间', '放款金额',
-                '应还金额', '贷款类型', '贷款期限']
+        filename = file + 'loan' + now.strftime(format) + '.csv'
+        head = ['用户编号', '贷款编号', '用户姓名', '手机号1', '手机号2', '身份证号', 'whatsappid', '放款时间', '应还款时间', '申请状态']
         with open(filename, 'w') as f:
             writer = csv.DictWriter(f, head)
             writer.writeheader()
@@ -193,17 +191,17 @@ class Connect(object):
         for i in threadlist:
             i.setDaemon(True)
             i.start()
-            if n > 10:
+            if n > 3:
                 i.join()
                 n = 0
             n = n + 1
         i.join()
 
-    def dueaction(self, limit):
+    def dueaction(self, limit,file):
         now = datetime.datetime.now()
         format = "%Y-%m-%d-%H-%M-%S"
-        filename2 = 'overdue' + now.strftime(format) + '.csv'
-        head2 = ['用户编号', '贷款编号', '用户姓名', '手机号', '放款时间', '还款时间', '逾期天数']
+        filename2 = file +'overdue' + now.strftime(format) + '.csv'
+        head2 = ['用户编号', '贷款编号', '用户姓名', '手机号1', '手机号2','身份证号', 'whatsappid','放款时间', '应还款时间', '逾期天数','申请状态']
         with open(filename2, 'w') as f:
             writer = csv.DictWriter(f, head2)
             writer.writeheader()
@@ -221,7 +219,7 @@ class Connect(object):
         for i in threadlist:
             i.setDaemon(True)
             i.start()
-            if n > 10:
+            if n > 3:
                 i.join()
                 n = 0
             n = n + 1
@@ -238,11 +236,10 @@ if __name__ == '__main__':
         userdataf['password'] = input('输入密码： ')
     basereq.loginaction(userdataf)
     # basereq.action(200)
-    t1 = Process(target=basereq.action,args=(200,))
-    t2 = Process(target=basereq.dueaction,args=(200,))
+    file=userdataf['mobile']
+    t1 = Process(target=basereq.action,args=(200,file,))
     t1.start()
-    t2.start()
     t1.join()
-    t2.join()
+
 
 
