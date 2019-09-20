@@ -10,14 +10,14 @@ socket.setdefaulttimeout(20)
 class Connect(object):
     def __init__(self):
         self.headers = {
-            "Host": "adminweb.adminrichboxbox.com",
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0",
+            "Host": " adminweb.adminrichboxbox.com",
+            "User-Agent": " Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0",
             "Accept": "*/*",
-            "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
-            "Accept-Encoding": "gzip, deflate, br",
+            "Accept-Language": " zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
+            "Accept-Encoding": " gzip, deflate, br",
             "Referer": "https://adminweb.adminrichboxbox.com/collection/my",
-            "x-admin-token": "eyJsb2NhbGUiOiJ6aF9DTiIsImFsZyI6IkhTNTEyIn0.eyJzdWIiOiIwODE4MDAwMDAxOCIsImV4cCI6MTU2OTA0MTgyOX0.Ax-3Hm92_StveXw5PgZD_g955C-SHrgw6fd7of-3RcPkcLFQlWUDD9ZAwkmRUj24gsC-Cei7Fd0dIzPZdBHxyQ",
-            "origin": "https://adminweb.adminrichboxbox.com",
+            "x-admin-token": " eyJsb2NhbGUiOiJ6aF9DTiIsImFsZyI6IkhTNTEyIn0.eyJzdWIiOiIwMDkiLCJleHAiOjE1NjkwNDI3MDh9.B9Q6ZGi8b05eYJBwSLNWW19q70zTpeizKLe8c3B_xsHi6RO1GEAfbvyBAfYybU4Z30irzlbjYsW002AO4Q9ScA",
+            "origin": " https://adminweb.adminrichboxbox.com",
             "Connection": "keep-alive"
         }
         #自定义请求方法，获取cookie
