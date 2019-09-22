@@ -42,9 +42,7 @@ class Connect(object):
     def totale(self,token):
         dataformat = {
             "number": 0,
-            "size": 10,
-            "endTime": "2019-09-30 23:59:59",
-            "startTime": "2019-08-25 00:00:00"
+            "size": 10
         }
         self.headers['token'] = token
         data1 = json.dumps(dataformat)
