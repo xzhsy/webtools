@@ -53,7 +53,7 @@ class Pqcontent(object):
     def reqbase(self,pg,file):
         basedic = {}
         url = self.baseurl + str(pg)
-        reqs = requests.get(url,headers=self.header,verify = False) ## 替换为ssl证书位置
+        reqs = request.GET(url,headers=self.header,verify = False) ## 替换为ssl证书位置
         content = reqs.text
         format = BeautifulSoup(content, "html.parser")
         pages = re.finditer(page, content)

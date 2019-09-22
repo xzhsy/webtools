@@ -29,7 +29,7 @@ class Connect(object):
         hanler = urllib.request.HTTPCookieProcessor(cookie_object)
         self.opener = urllib.request.build_opener(hanler)
 
-        #定义请求连接获取用户编码 customerId
+        #定义请求连接获取用户编码 customerId load-customers 全部客户
         self.baseurl='http://149.129.222.131:9999/api/api/customer/load-customers?'
         #获取用户个人信息
         self.perUrl='http://149.129.222.131:9999/api/api/customer/load-personal-info?'
@@ -57,7 +57,7 @@ class Connect(object):
         dataformat = {
             "offset": offset,
             "limit": limit,
-            "registerStartTime": "2019-08-31",
+            "registerStartTime": "2019-09-01",
             "registerEndTime" :"2019-10-12"
         }
         data = urllib.parse.urlencode(dataformat)

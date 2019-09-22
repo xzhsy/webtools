@@ -26,6 +26,9 @@ class Connect(object):
         hanler = urllib.request.HTTPCookieProcessor(cookie_object)
         self.opener = urllib.request.build_opener(hanler)
 
+
+        #全部客户
+        #http://149.129.222.131:9999/api/api/customer/load-customers?offset=0&limit=10
         #定义请求连接
         self.baseurl='http://149.129.222.131:9999/api/api/collection/my?'
         self.userUrl='http://149.129.222.131:9999/api/api/review/personalInfo?'
