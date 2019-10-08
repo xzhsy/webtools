@@ -24,7 +24,6 @@ class Connect(object):
             "Accept-Language": " en-US,en;q=0.5",
             "Accept-Encoding": " gzip, deflate, br",
             "Referer": " https://adminweb.adminrichboxbox.com/",
-            "X-ADMIN-TOKEN": "eyJsb2NhbGUiOiJ6aF9DTiIsImFsZyI6IkhTNTEyIn0.eyJzdWIiOiIwMTkiLCJleHAiOjE1Njg0NzE2MTJ9.SEaOIRsbtZHVAATXdCfkzrLw1CnDYJKv75ZB6_3qnM9O7hRt8cqYYXVXmQ1tIXzKKTPqIz8aPJEzFRuVKfBjmw",
             "Connection": " keep-alive",
             "Pragma": " no-cache",
             "Cache-Control": " no-cache"
@@ -171,7 +170,7 @@ class Connect(object):
     def action(self, limit,file):
         now = datetime.datetime.now()
         format = "%Y-%m-%d-%H-%M-%S"
-        filename = file + 'loan' + now.strftime(format) + '.csv'
+        filename = file + '-loan' + now.strftime(format) + '.csv'
         head = ['用户编号', '贷款编号', '用户姓名', '手机号1', '手机号2', '身份证号', 'whatsappid', '放款时间', '应还款时间', '申请状态']
         with open(filename, 'w') as f:
             writer = csv.DictWriter(f, head)
@@ -200,7 +199,7 @@ class Connect(object):
     def dueaction(self, limit,file):
         now = datetime.datetime.now()
         format = "%Y-%m-%d-%H-%M-%S"
-        filename2 = file +'overdue' + now.strftime(format) + '.csv'
+        filename2 = file +'-overdue' + now.strftime(format) + '.csv'
         head2 = ['用户编号', '贷款编号', '用户姓名', '手机号1', '手机号2','身份证号', 'whatsappid','放款时间', '应还款时间', '逾期天数','申请状态']
         with open(filename2, 'w') as f:
             writer = csv.DictWriter(f, head2)

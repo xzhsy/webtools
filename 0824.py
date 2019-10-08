@@ -138,7 +138,7 @@ class Connect(object):
 if __name__ == '__main__':
     now = datetime.datetime.now()
     format = "%Y-%m-%d-%H-%M-%S"
-    filename='userinfo' + now.strftime(format)
+    filename='userinfo' + now.strftime(format) +'.csv'
     with open(filename, 'w') as f:
         head = ['工单id', '借款类型', '用户姓名', 'KTP身份证号','手机号', '应还金额','放款时间', '计划还款日', '还款时间', '实还金额','还款状态','逾期天数','逾期金额','借款金额','借款期限','当前期限'
                 ]

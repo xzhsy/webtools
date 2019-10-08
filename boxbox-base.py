@@ -16,7 +16,6 @@ class Connect(object):
             "Accept-Language": " zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
             "Accept-Encoding": " gzip, deflate, br",
             "Referer": "https://adminweb.adminrichboxbox.com/collection/my",
-            "x-admin-token": " eyJsb2NhbGUiOiJ6aF9DTiIsImFsZyI6IkhTNTEyIn0.eyJzdWIiOiIwMDkiLCJleHAiOjE1NjkwNDI3MDh9.B9Q6ZGi8b05eYJBwSLNWW19q70zTpeizKLe8c3B_xsHi6RO1GEAfbvyBAfYybU4Z30irzlbjYsW002AO4Q9ScA",
             "origin": " https://adminweb.adminrichboxbox.com",
             "Connection": "keep-alive"
         }

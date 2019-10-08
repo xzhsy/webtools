@@ -24,7 +24,6 @@ class Connect(object):
             "Accept-Language": " en-US,en;q=0.5",
             "Accept-Encoding": " gzip, deflate, br",
             "Referer": " https://adminweb.adminrichboxbox.com/",
-            "X-ADMIN-TOKEN": "eyJsb2NhbGUiOiJ6aF9DTiIsImFsZyI6IkhTNTEyIn0.eyJzdWIiOiIwMTkiLCJleHAiOjE1Njg0NzE2MTJ9.SEaOIRsbtZHVAATXdCfkzrLw1CnDYJKv75ZB6_3qnM9O7hRt8cqYYXVXmQ1tIXzKKTPqIz8aPJEzFRuVKfBjmw",
             "Connection": " keep-alive",
             "Pragma": " no-cache",
             "Cache-Control": " no-cache"
