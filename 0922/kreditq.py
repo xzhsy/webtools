@@ -3,7 +3,7 @@
 import urllib, json, time, socket,datetime
 import urllib.request
 import csv
-import sys
+import requests
 from http import cookiejar
 # socket.setdefaulttimeout(20)
 class Connect(object):
@@ -11,31 +11,45 @@ class Connect(object):
         cookie_object = cookiejar.CookieJar()
         hanler = urllib.request.HTTPCookieProcessor(cookie_object)
         self.opener = urllib.request.build_opener(hanler)
-        self.baseurl="https://api.kreditq.id/orderapi/v1/loan-order/get-repayment-list"
+        self.baseurl="https://super.kreditq.id/orderapi/v1/loan-order/get-repayment-list"
         self.headers = {
-        "Accept": "application/json, text/plain, */*",
-        "Content-Type": "application/json;charset=UTF-8",
-        "Referer": "https://pubs.kreditq.id/KreditQ/index.html",
-        "Sec-Fetch-Mode": "cors",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36"
+            "Host": "super.kreditq.id",
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0",
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Referer": "https://pubs.kreditq.id/KreditQ/index.html",
+            "Content-Type": "application/json;charset=utf-8",
+            "Content-Length": "36",
+            "Origin": "https://pubs.kreditq.id",
+            "Connection": "keep-alive", }
+        self.opurl='https://super.kreditq.id/orderapi/v1/loan-order/get-repayment-list'
+        self.opheader={
+            "Host": "super.kreditq.id",
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type,token",
+            "Origin": "https://pubs.kreditq.id",
+            "Connection": "keep-alive"
         }
     def get_token(self):
-        login = 'https://api.kreditq.id/orderapi/v1/order-user/login'
+        login = 'https://super.kreditq.id/orderapi/v1/order-user/login'
         passf = {
             "name": "doni",
             "password": "1234567"
         }
         passd = json.dumps(passf).encode('utf8')
-        request = urllib.request.Request(url=login, method='POST',
+        logreq=requests.options(url='https://super.kreditq.id/orderapi/v1/order-user/login',headers=self.opheader)
+        print(logreq.status_code)
+        reponse = requests.post(url=login,
                  headers=self.headers,data=passd)
-        print(request.full_url)
-        print(request.data,request.get_method())
-        response = urllib.request.urlopen(request)
-        # print(data)
-        contentb = str(response.read(), encoding='utf-8')
-        content = json.loads(contentb)
+        # print(reponse.text)
+        print(reponse.status_code )
+        content = json.loads(reponse.text)
         tokens=content['data']['accessToken']
-        response.close()
         print(tokens)
         return tokens
 
@@ -50,14 +64,13 @@ class Connect(object):
         data1 = json.dumps(dataformat)
         data3 = data1.encode('utf8')
         print(data1)
-        request = urllib.request.Request(url=self.baseurl, method='POST',
+        logreq=requests.options(url='https://super.kreditq.id/orderapi/v1/order-user/login',headers=self.opheader)
+        print(logreq.status_code)
+        response = requests.post(url=self.baseurl,
                                          headers=self.headers,data=data3)
-        print(request.full_url)
-        print(request.data,request.get_method())
-        response = urllib.request.urlopen(request)
-        # print(data)
-        contentb = str(response.read(), encoding='utf-8')
-        content = json.loads(contentb)
+        print(response.status_code)
+        print(response.text)
+        content = json.loads(response.text)
         print(content)
         response.close()
         totalcount=content['data']['totalElements']
@@ -73,18 +86,14 @@ class Connect(object):
         data1 = json.dumps(dataformat)
         data3 = data1.encode('utf8')
         print(data1)
-        request = urllib.request.Request(url=self.baseurl, method='POST',
+        logreq=requests.options(url='https://super.kreditq.id/orderapi/v1/order-user/login',headers=self.opheader)
+        print(logreq.status_code)
+        response = requests.post(url=self.baseurl,
                                          headers=self.headers,data=data3)
-        print(request.full_url)
-        print(request.data,request.get_method())
-        response = urllib.request.urlopen(request)
         # print(data)
-        contentb = str(response.read(), encoding='utf-8')
-        content = json.loads(contentb)
-        print(type(contentb))
-        # print(content['data'])
-        # print(content['totalElements'])
-        # content = json.loads(contentb, strict=False)
+        print(response.text)
+        print(response.status_code)
+        content = json.loads(response.text)
         response.close()
         contact_list = content['data']['content']
         faillist=[]
@@ -161,19 +170,4 @@ if __name__ == '__main__':
         except Exception as e:
             token=basereq.get_token()
             print(e)
-    # userdataf = {}
-    # userdataf['mobile'] = sys.argv[1]
-    # userdataf['password'] = sys.argv[2]
-    # basereq.loginaction(userdataf)
-    # # basereq.headers['Cookie'] = sys.argv[1]
-    # baseinfo = basereq.reqbase(0, 10)
-    # offset = baseinfo['offset'] + 10
-    # totalCount = baseinfo['totalCount']
-    # contact_list = baseinfo['list']
-    # basereq.userInfo(contact_list,filename)
-    # while offset <= totalCount:
-    #     baseinfo = basereq.reqbase(offset, 10)
-    #     contact_list = baseinfo['list']
-    #     basereq.userInfo(contact_list,filename)
-    #     offset = offset + 10
 

@@ -56,13 +56,12 @@ class Connect(object):
         response.close()
 
     # 放款时间
-    def reqLaninfo(self, status,offset,limit,filename):
+    def reqLaninfo(self, offset,limit,filename):
         dataformat = {
-            "loanStatus": status,
             "offset": offset,
             "limit": limit,
-            "startTime": "2019-08-31",
-            "endTime": "2019-10-01"
+            "startTime": "2019-10-01",
+            "endTime": "2019-10-26"
         }
         data = urllib.parse.urlencode(dataformat)
         baseurl = self.loanurl + data
@@ -83,7 +82,7 @@ class Connect(object):
             loandic = {}
             loandic['放款编号'] = i['orderNo']
             loandic['贷款编号'] = i['loanAppId']
-            loandic['贷款状态'] = status
+            loandic['贷款状态'] = ''
             loandic['用户姓名'] = i['realName']
             loandic['手机号'] = i['mobile']
             loandic['创建时间'] = i['createTime']
@@ -109,27 +108,26 @@ class Connect(object):
             writer = csv.DictWriter(f, head)
             writer.writeheader()
         # basereq.headers['Cookie'] = sys.argv[1]
-        paras=['PAID_OFF','OVERDUE']
-        for i in paras:
-            baseinfo = basereq.reqLaninfo(i,0, 10,filename1)
-            offset = 10
-            totalCount = baseinfo['totalcount']
-            threadlist = []
-            while offset <= totalCount:
-                # basereq.userInfo(contact_list, filename)
-                t = threading.Thread(target=basereq.reqLaninfo,args=(i,offset, limit,filename1,))
-                offset = offset + limit
-                threadlist.append(t)
 
-            n = 0
-            for m in threadlist:
-                m.setDaemon(True)
-                m.start()
-                if n > 10:
-                    m.join()
-                    n = 0
-                n = n + 1
-            m.join()
+        baseinfo = basereq.reqLaninfo(0, 10,filename1)
+        offset = 10
+        totalCount = baseinfo['totalcount']
+        threadlist = []
+        while offset <= totalCount:
+            # basereq.userInfo(contact_list, filename)
+            t = threading.Thread(target=basereq.reqLaninfo,args=(offset, limit,filename1,))
+            offset = offset + limit
+            threadlist.append(t)
+
+        n = 0
+        for m in threadlist:
+            m.setDaemon(True)
+            m.start()
+            if n > 10:
+                m.join()
+                n = 0
+            n = n + 1
+        m.join()
 
 
 

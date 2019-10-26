@@ -58,7 +58,6 @@ class Connect(object):
 
     def reqdepoinfo(self, offset, limit, filename):
         dataformat = {
-            "depositStatus": 'CLEARED',
             "offset": offset,
             "limit": limit,
             "startTime":"2019-09-01",
@@ -84,7 +83,7 @@ class Connect(object):
             depodic['还款编号'] = i['orderNo']
             depodic['贷款编号'] = i['loanAppId']
             depodic['还款到账时间'] = i['reachedTime']
-            depodic['交易状态'] = 'CLEARED'
+            depodic['交易状态'] = ''
             depodic['用户姓名'] = i['realName']
             depodic['手机号'] = i['mobile']
             depodic['创建时间'] = i['createTime']
