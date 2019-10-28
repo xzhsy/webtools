@@ -1,7 +1,8 @@
 # encoding=utf-8
 from selenium import webdriver
+from bs4 import BeautifulSoup
 import time
-
+import math
 # 启动chrome浏览器
 driver = webdriver.Firefox()
 # 进入qq邮箱登陆首页
@@ -38,11 +39,25 @@ driver.find_element_by_xpath('//*[@class="ivu-menu-submenu ivu-menu-opened"]/ul/
 time.sleep(1)
 total=driver.find_element_by_xpath('//*[@class="ivu-page-total"]')
 print(total.text)
+c=int(total.text.split(' ')[1])
+count=math.floor(c/100)
+driver.find_element_by_xpath('//*[@class="ivu-select ivu-select-single ivu-select-small"]/div/div/span').click()
+time.sleep(1)
+driver.find_element_by_xpath('//*[@class="ivu-select ivu-select-visible ivu-select-single ivu-select-small"]/div[2]/ul[2]/li[6]').click()
+ctext=driver.page_source
+content=BeautifulSoup(ctext,"html.parser")
+
+with open('a.txt','a') as f:
+    f.write(ctext)
+f.close()
+
 i=1
-if i <= 10:
-    res=driver.find_element_by_xpath('//*[@class="ivu-page-next"]' ).text
+while i <= count:
+    driver.find_element_by_xpath('//*[@class="ivu-page-next"]' ).click()
+    res=driver.page_source
+    restxt= BeautifulSoup(res,"html.parser")
     with open('a.txt','a') as f:
-        f.write(res.get_attribute())
+        f.write(res)
     f.close()
     time.sleep(3)
     i = i + 1
