@@ -3,6 +3,8 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 import time
 import math
+import csv
+import datetime
 # 启动chrome浏览器
 driver = webdriver.Firefox()
 # 进入qq邮箱登陆首页
@@ -35,7 +37,10 @@ driver.find_element_by_xpath('//*[@class="custom-content-con"]/div[2]/div/div[2]
 time.sleep(1)
 driver.find_element_by_xpath('//*[@class="ivu-menu-submenu"]/div/span').click()
 time.sleep(1)
-driver.find_element_by_xpath('//*[@class="ivu-menu-submenu ivu-menu-opened"]/ul/li[1]').click()
+#pdl
+#driver.find_element_by_xpath('//*[@class="ivu-menu-submenu ivu-menu-opened"]/ul/li[1]').click()
+#fenqi
+driver.find_element_by_xpath('//*[@class="ivu-menu-submenu ivu-menu-opened"]/ul/li[2]').click()
 time.sleep(1)
 total=driver.find_element_by_xpath('//*[@class="ivu-page-total"]')
 print(total.text)
@@ -45,20 +50,42 @@ driver.find_element_by_xpath('//*[@class="ivu-select ivu-select-single ivu-selec
 time.sleep(1)
 driver.find_element_by_xpath('//*[@class="ivu-select ivu-select-visible ivu-select-single ivu-select-small"]/div[2]/ul[2]/li[6]').click()
 ctext=driver.page_source
-content=BeautifulSoup(ctext,"html.parser")
-
-with open('a.txt','a') as f:
+with open('a.txt','w') as f:
     f.write(ctext)
 f.close()
-
+def savefile(afile):
+    now = datetime.datetime.now()
+    format = "%Y-%m-%d-%H-%M-%S"
+    # filename = 'doni-pdl-'+now.strftime(format)+'.csv'
+    filename = 'doni-fenqi-' + now.strftime(format) + '.csv'
+    with open(filename, 'w') as f:
+        head = [
+                ]
+        writer = csv.writer(f, dialect='excel')
+        writer.writerow(head)
+    f.close()
+    with open(afile, 'r', encoding='utf-8') as f:
+        content = f.read()
+    f.close()
+    restxt = BeautifulSoup(content,'html.parser')
+    for lines in restxt.find_all('tr',class_="ivu-table-row"):
+        lineslist = []
+        for line in lines.find_all('span'):
+            lineslist.append(line.string)
+        print(lineslist)
+        with open(filename,'a' ,newline='') as f:
+            csv_writer =csv.writer(f)
+            csv_writer.writerow(lineslist)
+        f.close()
 i=1
 while i <= count:
     driver.find_element_by_xpath('//*[@class="ivu-page-next"]' ).click()
     res=driver.page_source
-    restxt= BeautifulSoup(res,"html.parser")
     with open('a.txt','a') as f:
         f.write(res)
     f.close()
     time.sleep(3)
     i = i + 1
 # driver.quit()
+
+savefile('a.txt')
