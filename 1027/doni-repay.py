@@ -24,41 +24,44 @@ driver.maximize_window()
 #########登陆
 # 输入用户名
 # username = driver.find_element_by_xpath("//*[@id='u']")
-username = driver.find_element_by_xpath('//*[@type="text"]')
-username.clear()
-# 将xxxxxxxxxx换成qq邮箱账户type="password
-username.send_keys('doni')
-# 输入密码：将1111111111替换为自己的邮箱密码
-driver.find_element_by_xpath('//*[@type="password"]').send_keys('1234567')
-# 点击登陆
-driver.find_element_by_xpath('//*[@type="button"]').click()
-time.sleep(3)
-driver.find_element_by_xpath('//*[@class="ivu-icon ivu-icon-md-arrow-dropdown"]').click()
-time.sleep(1)
-driver.find_element_by_xpath('//*[@class="custom-content-con"]/div[2]/div/div/a').click()
-time.sleep(1)
-driver.find_element_by_xpath('//*[@class="custom-content-con"]/div[2]/div/div[2]/ul/li[1]').click()
-time.sleep(1)
-#还款查询
-driver.find_element_by_xpath('//*[@class="side-menu-wrapper"]/ul/li[2]/span').click()
-time.sleep(1)
-#添加赛选条件
-driver.find_element_by_xpath('//*[@placeholder="选择日期"]').click()
-time.sleep(1)
-# 'class="ivu-picker-panel-content ivu-picker-panel-content-left"'
-#span 确定具体日期 20+2 =20号
-# 开始时间'class="ivu-picker-panel-content ivu-picker-panel-content-left"]/dev[2]/span[22]'
-driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-left"]/div[2]/span[24]').click()
-time.sleep(1)
-#结束时间
-driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-right"]/div[2]/span[35]').click()
-time.sleep(1)
-#确认
-driver.find_element_by_xpath('//*[@class="ivu-picker-confirm"]/button[3]/span').click()
-time.sleep(1)
-#查询
-driver.find_element_by_xpath('//*[@class="search-inline search-mar ivu-btn ivu-btn-primary ivu-btn-small"]/span').click()
-time.sleep(1)
+def login():
+    username = driver.find_element_by_xpath('//*[@type="text"]')
+    username.clear()
+    # 将xxxxxxxxxx换成qq邮箱账户type="password
+    username.send_keys('doni')
+    # 输入密码：将1111111111替换为自己的邮箱密码
+    driver.find_element_by_xpath('//*[@type="password"]').send_keys('1234567')
+    # 点击登陆
+    driver.find_element_by_xpath('//*[@type="button"]').click()
+    time.sleep(3)
+
+def filres():
+    driver.find_element_by_xpath('//*[@class="ivu-icon ivu-icon-md-arrow-dropdown"]').click()
+    time.sleep(1)
+    driver.find_element_by_xpath('//*[@class="custom-content-con"]/div[2]/div/div/a').click()
+    time.sleep(1)
+    driver.find_element_by_xpath('//*[@class="custom-content-con"]/div[2]/div/div[2]/ul/li[1]').click()
+    time.sleep(1)
+    #还款查询
+    driver.find_element_by_xpath('//*[@class="side-menu-wrapper"]/ul/li[2]/span').click()
+    time.sleep(1)
+    #添加赛选条件
+    driver.find_element_by_xpath('//*[@placeholder="选择日期"]').click()
+    time.sleep(1)
+    # 'class="ivu-picker-panel-content ivu-picker-panel-content-left"'
+    #span 确定具体日期 20+2 =20号
+    # 开始时间'class="ivu-picker-panel-content ivu-picker-panel-content-left"]/dev[2]/span[22]'
+    driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-left"]/div[2]/span[24]').click()
+    time.sleep(1)
+    #结束时间
+    driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-right"]/div[2]/span[35]').click()
+    time.sleep(1)
+    #确认
+    driver.find_element_by_xpath('//*[@class="ivu-picker-confirm"]/button[3]/span').click()
+    time.sleep(1)
+    #查询
+    driver.find_element_by_xpath('//*[@class="search-inline search-mar ivu-btn ivu-btn-primary ivu-btn-small"]/span').click()
+    time.sleep(1)
 #催收查询
 # driver.find_element_by_xpath('//*[@class="ivu-menu-submenu"]/div/span').click()
 # time.sleep(1)
@@ -67,6 +70,8 @@ time.sleep(1)
 #fenqi
 # driver.find_element_by_xpath('//*[@class="ivu-menu-submenu ivu-menu-opened"]/ul/li[2]').click()
 # time.sleep(1)
+login()
+filres()
 total=driver.find_element_by_xpath('//*[@class="ivu-page-total"]')
 print(total.text)
 c=int(total.text.split(' ')[1])
@@ -105,14 +110,26 @@ def savefile(afile):
 savefile('a.txt')
 i=1
 while i <= count:
-    driver.find_element_by_xpath('//*[@class="ivu-page-next"]' ).click()
-    res=driver.page_source
-    with open('a.txt','w') as f:
-        f.write(res)
-    f.close()
-    time.sleep(3)
-    savefile('a.txt')
-    i = i + 1
+    try:
+        driver.find_element_by_xpath('//*[@class="ivu-page-next"]' ).click()
+        res=driver.page_source
+        with open('a.txt','w') as f:
+            f.write(res)
+        f.close()
+        time.sleep(3)
+        savefile('a.txt')
+        i = i + 1
+    except Exception as e:
+        login()
+        filres()
+        driver.find_element_by_xpath('//*[@class="ivu-select ivu-select-single ivu-select-small"]/div/div/span').click()
+        time.sleep(1)
+        driver.find_element_by_xpath(
+            '//*[@class="ivu-select ivu-select-visible ivu-select-single ivu-select-small"]/div[2]/ul[2]/li[6]').click()
+        n=0
+        while n < i:
+            driver.find_element_by_xpath('//*[@class="ivu-page-next"]').click()
+            n = n + 1
 # driver.quit()
 
 
