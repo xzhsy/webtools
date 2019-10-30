@@ -102,7 +102,7 @@ def savefile(afile):
         lineslist = []
         for line in lines.find_all('span'):
             lineslist.append(line.string)
-        print(lineslist)
+        # print(lineslist)
         with open(filename,'a' ,newline='') as f:
             csv_writer =csv.writer(f)
             csv_writer.writerow(lineslist)
@@ -110,6 +110,7 @@ def savefile(afile):
 savefile('a.txt')
 i=1
 while i <= count:
+    print(i)
     try:
         driver.find_element_by_xpath('//*[@class="ivu-page-next"]' ).click()
         res=driver.page_source
@@ -118,7 +119,6 @@ while i <= count:
         f.close()
         time.sleep(3)
         savefile('a.txt')
-        i = i + 1
     except Exception as e:
         login()
         filres()
@@ -128,8 +128,13 @@ while i <= count:
             '//*[@class="ivu-select ivu-select-visible ivu-select-single ivu-select-small"]/div[2]/ul[2]/li[6]').click()
         n=0
         while n < i:
-            driver.find_element_by_xpath('//*[@class="ivu-page-next"]').click()
+            try:
+                driver.find_element_by_xpath('//*[@class="ivu-page-next"]').click()
+            except Exception as e:
+                break
             n = n + 1
+    i = i + 1
+
 # driver.quit()
 
 
