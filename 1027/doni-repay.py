@@ -6,7 +6,11 @@ import math
 import csv
 import datetime
 # 启动chrome浏览器
-driver = webdriver.Firefox()
+
+firfox_options = webdriver.FirefoxOptions()
+firfox_options.headless=True
+driver = webdriver.Firefox(options=firfox_options)
+# driver = webdriver.Firefox()
 # 进入qq邮箱登陆首页
 driver.get("https://pubs.kreditq.id/KreditQ/index.html#/login")
 time.sleep(1)
@@ -35,17 +39,34 @@ driver.find_element_by_xpath('//*[@class="custom-content-con"]/div[2]/div/div/a'
 time.sleep(1)
 driver.find_element_by_xpath('//*[@class="custom-content-con"]/div[2]/div/div[2]/ul/li[1]').click()
 time.sleep(1)
-# #还款查询
-# driver.find_element_by_xpath('//*[@class="side-menu-wrapper"]/ul/li[2]/span').click()
+#还款查询
+driver.find_element_by_xpath('//*[@class="side-menu-wrapper"]/ul/li[2]/span').click()
+time.sleep(1)
+#添加赛选条件
+driver.find_element_by_xpath('//*[@placeholder="选择日期"]').click()
+time.sleep(1)
+# 'class="ivu-picker-panel-content ivu-picker-panel-content-left"'
+#span 确定具体日期 20+2 =20号
+# 开始时间'class="ivu-picker-panel-content ivu-picker-panel-content-left"]/dev[2]/span[22]'
+driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-left"]/div[2]/span[24]').click()
+time.sleep(1)
+#结束时间
+driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-right"]/div[2]/span[35]').click()
+time.sleep(1)
+#确认
+driver.find_element_by_xpath('//*[@class="ivu-picker-confirm"]/button[3]/span').click()
+time.sleep(1)
+#查询
+driver.find_element_by_xpath('//*[@class="search-inline search-mar ivu-btn ivu-btn-primary ivu-btn-small"]/span').click()
+time.sleep(1)
+#催收查询
+# driver.find_element_by_xpath('//*[@class="ivu-menu-submenu"]/div/span').click()
 # time.sleep(1)
-# 催收查询
-driver.find_element_by_xpath('//*[@class="ivu-menu-submenu"]/div/span').click()
-time.sleep(1)
-# pdl
-driver.find_element_by_xpath('//*[@class="ivu-menu-submenu ivu-menu-opened"]/ul/li[1]').click()
-# fenqi
-driver.find_element_by_xpath('//*[@class="ivu-menu-submenu ivu-menu-opened"]/ul/li[2]').click()
-time.sleep(1)
+#pdl
+#driver.find_element_by_xpath('//*[@class="ivu-menu-submenu ivu-menu-opened"]/ul/li[1]').click()
+#fenqi
+# driver.find_element_by_xpath('//*[@class="ivu-menu-submenu ivu-menu-opened"]/ul/li[2]').click()
+# time.sleep(1)
 total=driver.find_element_by_xpath('//*[@class="ivu-page-total"]')
 print(total.text)
 c=int(total.text.split(' ')[1])
@@ -57,12 +78,12 @@ ctext=driver.page_source
 with open('a.txt','w') as f:
     f.write(ctext)
 f.close()
+now = datetime.datetime.now()
+format = "%Y-%m-%d-%H-%M-%S"
+# filename = 'doni-pdl-'+now.strftime(format)+'.csv'
+filename = 'doni-' + now.strftime(format) + '.csv'
 def savefile(afile):
-    now = datetime.datetime.now()
-    format = "%Y-%m-%d-%H-%M-%S"
-    # filename = 'doni-pdl-'+now.strftime(format)+'.csv'
-    filename = 'doni-' + now.strftime(format) + '.csv'
-    with open(filename, 'w') as f:
+    with open(filename, 'a') as f:
         head = [
                 ]
         writer = csv.writer(f, dialect='excel')
@@ -81,15 +102,17 @@ def savefile(afile):
             csv_writer =csv.writer(f)
             csv_writer.writerow(lineslist)
         f.close()
+savefile('a.txt')
 i=1
 while i <= count:
     driver.find_element_by_xpath('//*[@class="ivu-page-next"]' ).click()
     res=driver.page_source
-    with open('a.txt','a') as f:
+    with open('a.txt','w') as f:
         f.write(res)
     f.close()
     time.sleep(3)
+    savefile('a.txt')
     i = i + 1
 # driver.quit()
 
-savefile('a.txt')
+
