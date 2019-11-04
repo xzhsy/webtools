@@ -10,13 +10,13 @@ socket.setdefaulttimeout(20)
 class Connect(object):
     def __init__(self):
         self.headers = {
-            "Host": " adminweb.adminrichboxbox.com",
+            "Host": " adminweb.gedana888.com",
             "User-Agent": " Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0",
             "Accept": "*/*",
             "Accept-Language": " zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
             "Accept-Encoding": " gzip, deflate, br",
-            "Referer": "https://adminweb.adminrichboxbox.com/collection/my",
-            "origin": " https://adminweb.adminrichboxbox.com",
+            "Referer": "https://adminweb.gedana888.com/collection/my",
+            "origin": " https://adminweb.gedana888.com",
             "Connection": "keep-alive"
         }
         #自定义请求方法，获取cookie
@@ -25,12 +25,12 @@ class Connect(object):
         self.opener = urllib.request.build_opener(hanler)
 
         #定义请求连接
-        self.baseurl='https://adminweb.adminrichboxbox.com/api/api/collection/my?'
-        self.userUrl='https://adminweb.adminrichboxbox.com/api/api/review/personalInfo?'
-        self.loadUrl='https://adminweb.adminrichboxbox.com/api/api/collection/collection-loan-detail?'
+        self.baseurl='https://adminweb.gedana888.com/api/api/collection/my?'
+        self.userUrl='https://adminweb.gedana888.com/api/api/review/personalInfo?'
+        self.loadUrl='https://adminweb.gedana888.com/api/api/collection/collection-loan-detail?'
         #验证码连接
-        self.catpch='https://adminweb.adminrichboxbox.com/api/auth/captcha?width=120&height=50&serialId=KY1uqphQ'
-        self.login = 'https://adminweb.adminrichboxbox.com/api/auth/login'
+        self.catpch='https://adminweb.gedana888.com/api/auth/captcha?width=120&height=50&serialId=KY1uqphQ'
+        self.login = 'https://adminweb.gedana888.com/api/auth/login'
 
     def loginaction(self,userdataf):
         caprep = urllib.request.Request(self.catpch)
@@ -109,10 +109,9 @@ if __name__ == '__main__':
         writer = csv.DictWriter(f, head)
         writer.writeheader()
     # basereq.headers['Cookie'] = sys.argv[1]
-
-    baseinfo = basereq.reqbase(0, 10,)
+    baseinfo = basereq.reqbase(0, 10)
     offset = baseinfo['offset'] + 10
     totalCount = baseinfo['totalCount']
     while offset <= totalCount:
-        baseinfo = basereq.reqbase(offset, 100,)
+        baseinfo = basereq.reqbase(offset, 100)
         offset = offset + 100
