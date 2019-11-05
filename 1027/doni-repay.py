@@ -40,21 +40,23 @@ def filres():
     time.sleep(1)
     driver.find_element_by_xpath('//*[@class="custom-content-con"]/div[2]/div/div/a').click()
     time.sleep(1)
-    driver.find_element_by_xpath('//*[@class="custom-content-con"]/div[2]/div/div[2]/ul/li[1]').click()
+    driver.find_element_by_xpath('//*[@class="custom-content-con"]/div[2]/div/div[2]/ul/li[2]').click()
     time.sleep(1)
     #还款查询
     driver.find_element_by_xpath('//*[@class="side-menu-wrapper"]/ul/li[2]/span').click()
     time.sleep(1)
     #添加赛选条件
-    driver.find_element_by_xpath('//*[@placeholder="选择日期"]').click()
+    driver.find_element_by_xpath('//*[@placeholder="Select date"]').click()
     time.sleep(1)
     # 'class="ivu-picker-panel-content ivu-picker-panel-content-left"'
     #span 确定具体日期 20+2 =20号
     # 开始时间'class="ivu-picker-panel-content ivu-picker-panel-content-left"]/dev[2]/span[22]'
-    driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-left"]/div[2]/span[24]').click()
+    driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-left"]/div[1]/span[2]/i').click()
+    time.sleep(1)
+    driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-left"]/div[2]/span[16]').click()
     time.sleep(1)
     #结束时间
-    driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-right"]/div[2]/span[35]').click()
+    driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-right"]/div[2]/span[10]').click()
     time.sleep(1)
     #确认
     driver.find_element_by_xpath('//*[@class="ivu-picker-confirm"]/button[3]/span').click()
