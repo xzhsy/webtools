@@ -40,6 +40,7 @@ def filres():
     time.sleep(1)
     driver.find_element_by_xpath('//*[@class="custom-content-con"]/div[2]/div/div/a').click()
     time.sleep(1)
+    #选择语言english
     driver.find_element_by_xpath('//*[@class="custom-content-con"]/div[2]/div/div[2]/ul/li[2]').click()
     time.sleep(1)
     #还款查询
@@ -133,7 +134,7 @@ while i <= count:
             try:
                 driver.find_element_by_xpath('//*[@class="ivu-page-next"]').click()
             except Exception as e:
-                break
+                continue
             n = n + 1
     i = i + 1
 
