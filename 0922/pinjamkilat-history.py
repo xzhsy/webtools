@@ -105,15 +105,18 @@ class Connect(object):
         userlist=[]
         for i in content:
             userdic = {}
-            userdic['子手机号'] = i['mobile']
-            userdic['子贷款编号'] = i['id']
-            userdic['子申请时间'] = i['applyTime']
-            userdic['证件号码'] = i['credentialNo']
-            userdic['贷款类型'] = i['loanType']['value']
-            userdic['期限'] = i['period']
-            userdic['状态'] = i['period']
-            userdic['子贷款状态'] = i['subStatus']
-            userdic['逾期天数'] = i['overdueDays']
+            userdic['子手机号'] = i.setdefault('mobile')
+            userdic['子贷款编号'] = i.setdefault('id')
+            userdic['子申请时间'] = i.setdefault('applyTime')
+            userdic['证件号码'] = i.setdefault('credentialNo')
+            if i['loanType']:
+                userdic['贷款类型'] = i['loanType']['value']
+            else:
+                userdic['贷款类型'] = None
+            userdic['期限'] = i.setdefault('period')
+            userdic['状态'] = i.setdefault('period')
+            userdic['子贷款状态'] = i.setdefault('subStatus')
+            userdic['逾期天数'] = i.setdefault('overdueDays')
             userdic.update(para)
             userlist.append(userdic)
         return  userlist
