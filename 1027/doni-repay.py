@@ -41,13 +41,18 @@ def filres():
     driver.find_element_by_xpath('//*[@class="custom-content-con"]/div[2]/div/div/a').click()
     time.sleep(1)
     #选择语言english
-    driver.find_element_by_xpath('//*[@class="custom-content-con"]/div[2]/div/div[2]/ul/li[2]').click()
+    driver.find_element_by_xpath('//*[@class="custom-content-con"]/div[2]/div/div[2]/ul/li[1]').click()
     time.sleep(1)
     #还款查询
     driver.find_element_by_xpath('//*[@class="side-menu-wrapper"]/ul/li[2]/span').click()
     time.sleep(1)
     #添加赛选条件
-    driver.find_element_by_xpath('//*[@placeholder="Select date"]').click()
+    d=driver.find_elements_by_xpath('//*[@placeholder="Select date"]')
+    if d:
+        driver.find_element_by_xpath('//*[@placeholder="Select date"]').click()
+    d1=driver.find_elements_by_xpath('//*[@placeholder="选择日期"]')
+    if d1:
+        driver.find_element_by_xpath('//*[@placeholder="选择日期"]').click()
     time.sleep(1)
     # 'class="ivu-picker-panel-content ivu-picker-panel-content-left"'
     #span 确定具体日期 20+2 =20号
