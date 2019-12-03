@@ -57,7 +57,8 @@ class Connect(object):
         limit=limit
         dataformat = {
             "page": page,
-            "rows": limit
+            "rows": limit,
+            "expectedRepayDate": "2019-11-15,2019-12-03"
         }
         self.headers['Cookie'] = "lang=zh; JSESSIONID=" + self.cookie + "; INST_ORG=bj_qianbang"
         data = urllib.parse.urlencode(dataformat).encode(encoding='UTF8')
