@@ -10,8 +10,8 @@ import datetime
 firfox_options = webdriver.FirefoxOptions()
 firfox_options.headless=True
 driver = webdriver.Firefox(options=firfox_options)
-# driver = webdriver.Firefox()
-# 进入qq邮箱登陆首页
+#driver = webdriver.Firefox()
+# 进登陆首页
 driver.get("https://pubs.kreditq.id/KreditQ/index.html#/login")
 time.sleep(1)
 
@@ -40,24 +40,31 @@ def filres():
     time.sleep(1)
     driver.find_element_by_xpath('//*[@class="custom-content-con"]/div[2]/div/div/a').click()
     time.sleep(1)
-    #选择语言english
-    driver.find_element_by_xpath('//*[@class="custom-content-con"]/div[2]/div/div[2]/ul/li[2]').click()
+    #选择语言
+    driver.find_element_by_xpath('//*[@class="custom-content-con"]/div[2]/div/div[2]/ul/li[1]').click()
     time.sleep(1)
     #还款查询
     driver.find_element_by_xpath('//*[@class="side-menu-wrapper"]/ul/li[2]/span').click()
     time.sleep(1)
     #添加赛选条件
-    driver.find_element_by_xpath('//*[@placeholder="Select date"]').click()
+    
+    d=driver.find_elements_by_xpath('//*[@placeholder="Select date"]')
+    if d:
+       driver.find_element_by_xpath('//*[@placeholder="Select date"]').click()
+    d1=driver.find_elements_by_xpath('//*[@placeholder="选择日期"]')
+    if d1:
+       driver.find_element_by_xpath('//*[@placeholder="选择日期"]').click()
     time.sleep(1)
     # 'class="ivu-picker-panel-content ivu-picker-panel-content-left"'
     #span 确定具体日期 20+2 =20号
-    # 开始时间'class="ivu-picker-panel-content ivu-picker-panel-content-left"]/dev[2]/span[22]'
-    driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-left"]/div[1]/span[2]/i').click()
+    #本月头一周，日期需往前反一页
+    driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-left"]/div[1]/span[2]').click()
     time.sleep(1)
-    driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-left"]/div[2]/span[16]').click()
+    # 开始时间'class="ivu-picker-panel-content ivu-picker-panel-content-left"]/dev[2]/span[22]'
+    driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-left"]/div[2]/span[20]').click()
     time.sleep(1)
     #结束时间
-    driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-right"]/div[2]/span[10]').click()
+    driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-right"]/div[2]/span[3]').click()
     time.sleep(1)
     #确认
     driver.find_element_by_xpath('//*[@class="ivu-picker-confirm"]/button[3]/span').click()
@@ -92,7 +99,7 @@ format = "%Y-%m-%d-%H-%M-%S"
 filename = 'doni-' + now.strftime(format) + '.csv'
 def savefile(afile):
     with open(filename, 'a') as f:
-        head = ['工单ID','用户姓名','KTP身份证号','手机号','应还金额','放款时间','计划还款日','实还金额','逾期天数','逾期金额','借款金额'
+        head = [
                 ]
         writer = csv.writer(f, dialect='excel')
         writer.writerow(head)
@@ -134,10 +141,11 @@ while i <= count:
             try:
                 driver.find_element_by_xpath('//*[@class="ivu-page-next"]').click()
             except Exception as e:
-                continue
+                break
             n = n + 1
     i = i + 1
 
 # driver.quit()
+
 
 
