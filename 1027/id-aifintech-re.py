@@ -1,46 +1,47 @@
 #!/bin/bash/env python
 # -*- coding:UTF-8 -*-
-import urllib, json, time, socket,datetime
+import urllib, json, time, socket, datetime
 import urllib.request
 import csv
 import sys
 from http import cookiejar
 socket.setdefaulttimeout(20)
 
+
 class Connect(object):
-    def __init__(self,cookie):
+    def __init__(self, cookie):
         self.headers = {
             "authority": "lmt-man.id-aifintech.cc",
             "method": "POST",
-            "path": "/cs/collection/getTotalList?flag=member",
+            "path": "/cs/collection/getOperatedFinishList",
             "scheme": "https",
             "accept": "application/json, text/javascript, */*; q=0.01",
             "accept-encoding": "gzip, deflate, br",
             "accept-language": "zh-CN,zh;q=0.9",
             "cache-control": "no-cache",
-            "content-length": "14",
             "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
             "origin": "https://lmt-man.id-aifintech.cc",
             "pragma": "no-cache",
-            "referer": "https://lmt-man.id-aifintech.cc/cs/common/frame/index?jspname=pages/csm/addressList/collectionCollector_query",
+            "referer": "https://lmt-man.id-aifintech.cc/cs/common/frame/index?jspname=pages/csm/collection/operateFinish",
             "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-origin",
+            "sec-fetch-site": " same-origin",
             "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36",
             "x-requested-with": "XMLHttpRequest"
         }
-        self.cookie=cookie
-        #自定义请求方法，获取cookie
+
+        self.cookie = cookie
+        # 自定义请求方法，获取cookie
         cookie_object = cookiejar.CookieJar()
         hanler = urllib.request.HTTPCookieProcessor(cookie_object)
         self.opener = urllib.request.build_opener(hanler)
 
-        #定义请求连接
-        self.baseurl='https://lmt-man.id-aifintech.cc/cs/collection/getTotalList?flag=member'
-        #登陆连接
-        self.before='https://lmt-man.id-aifintech.cc/cs/login'
+        # 定义请求连接，还款查询
+        self.baseurl = 'https://lmt-man.id-aifintech.cc/cs/collection/getOperatedFinishList'
+        # 登陆连接
+        self.before = 'https://lmt-man.id-aifintech.cc/cs/login'
         self.login = 'https://lmt-man.id-aifintech.cc/cs/j_spring_security_check'
 
-    def loginaction(self,userdataf):
+    def loginaction(self, userdataf):
         try:
             userdata = urllib.parse.urlencode(userdataf).encode(encoding='UTF8')
             login = urllib.request.Request(self.login, method='POST', data=userdata, headers=self.headers)
@@ -51,33 +52,27 @@ class Connect(object):
             print("登陆失败：", e)
             exit(1)
 
-    def reqbase(self,page,limit):
+    def reqbase(self, page, limit):
         limit=limit
         dataformat = {
-            "contractNo": '',
-            "applyCode": '',
-            "phoneNo": '',
             "chname": '',
-            "idNumber": '',
             "mobile": '',
-            "states": '',
-            "createStartDt": "2019-11-01",
-            "createEndDt": "2019-12-03",
-            "suggestConclusion": '',
-            "processStartDt": '',
-            "processEndDt": '',
-            "productType": '',
+            "collector": '',
+            "overdueLevel": '',
+            "dayInte": '',
+            "overduyDays": '',
+            "expectedRepayDate": "2019-11-15,2019-12-03",
+            "realRepayDate": '',
             "page": page,
-            "rows": limit
+            "rows": limit,
         }
-        self.headers['cookie'] = "lang=zh; JSESSIONID=" + self.cookie + "; INST_ORG=bj_qianbang"
+        self.headers['Cookie'] = "lang=zh; JSESSIONID=" + self.cookie + "; INST_ORG=bj_qianbang"
         data = urllib.parse.urlencode(dataformat).encode(encoding='UTF8')
-        baseurl=self.baseurl
+        baseurl = self.baseurl
         request = urllib.request.Request(url=baseurl, method='POST',data=data,headers=self.headers)
-        userinfo=[]
-        infodic={}
+        userinfo = []
+        infodic = {}
         print(request.full_url)
-        print(request.headers)
         # response = self.opener.open(request)
         response = urllib.request.urlopen(request)
         print(data)
@@ -88,21 +83,21 @@ class Connect(object):
         infodic['totalCount'] = content['total']
         for i in  content['rows']:
             midinfo = {}
-            midinfo['入催时间'] = i['createTime']
-            midinfo['客户名称'] = i['chname']
-            midinfo['手机号码'] = i['mobile']
-            if 'outDate' in i:
-                midinfo['出崔时间'] = i['outDate']
-            else:
-                midinfo['出崔时间'] =''
-            midinfo['应还日期'] = i['dueDate']
-            midinfo['最大逾期天数'] = i['hisMaxOverdueDays']
-            midinfo['业务状态'] = i['states']
-            midinfo['身份证号'] = i['idNumber']
+            midinfo["客户姓名"] = i["chname"]
+            midinfo["手机号码"] = i["mobile"]
+            midinfo["到账金额"] = i["arriveAmount"]
+            midinfo["逾期总金额"] = i["dayinte"]
+            midinfo["逾期天数"] = i["overdueDays"]
+            midinfo["逾期费用"] = i["realAmount"]
+            midinfo["逾期等级"] = i["overdueLevel"]
+            midinfo["放款日期"] = i["contractdate"]
+            midinfo["应还日期"] = i["startpaydate"]
+            midinfo["实际还款时间"] = i["outDate"]
+            midinfo["身份证号码"] = i["idnumber"]
             userinfo.append(midinfo)
         with open(filename, 'a',newline='') as f:
-            #贷款编号、任务状态、应还款日、还款时间、用户姓名、手机、申请状态、逾期天数
-            head = ['客户名称', '手机号码', '入催时间', '出崔时间', '应还日期', '最大逾期天数', '身份证号', '业务状态'
+            # 贷款编号、任务状态、应还款日、还款时间、用户姓名、手机、申请状态、逾期天数
+            head = ['客户姓名', '手机号码', '到账金额', '逾期总金额', '逾期天数', '逾期费用', '逾期等级', '放款日期','应还日期', '实际还款时间', '身份证号码'
                     ]
             writer = csv.DictWriter(f, head)
             for item in userinfo:
@@ -123,9 +118,9 @@ if __name__ == '__main__':
         userdataf['j_username'] = input('输入用户名： ')
         userdataf['j_password'] = input('输入密码： ')
     # basereq.loginaction(userdataf)
-    filename=userdataf['j_username']+ '-total-' + now.strftime(format) + '.csv'
+    filename=userdataf['j_username']+ '-re-' + now.strftime(format) + '.csv'
     with open(filename, 'w') as f:
-        head = ['客户名称', '手机号码', '入催时间', '出崔时间', '应还日期', '最大逾期天数', '身份证号', '业务状态'
+        head = ['客户姓名', '手机号码', '到账金额', '逾期总金额', '逾期天数', '逾期费用', '逾期等级', '放款日期', '应还日期', '实际还款时间', '身份证号码'
                 ]
         ##客户名称、入催时间、出崔时间、身份证号、手机号码、应还日期、最大逾期天数、业务状态
         writer = csv.DictWriter(f, head)
@@ -133,9 +128,10 @@ if __name__ == '__main__':
     # basereq.headers['Cookie'] = sys.argv[1]
     baseinfo = basereq.reqbase(1, 50)
     totalCount = baseinfo['totalCount']
-    page=2
-    limit=50
+    page = 2
+    limit = 50
     pages=round(totalCount/limit)
+    print(pages)
     while page <= pages:
         baseinfo = basereq.reqbase(page, limit)
         page = page + 1
