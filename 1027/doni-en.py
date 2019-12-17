@@ -58,7 +58,7 @@ def filres():
     # 'class="ivu-picker-panel-content ivu-picker-panel-content-left"'
     #span 确定具体日期 20+2 =20号
     #本月头一周，日期需往前反一页
-    driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-left"]/div[1]/span[2]').click()
+    driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-left"]/div[1]/span[2]/i').click()
     time.sleep(1)
     # 开始时间'class="ivu-picker-panel-content ivu-picker-panel-content-left"]/dev[2]/span[22]'
     driver.find_element_by_xpath('//*[@class="ivu-picker-panel-content ivu-picker-panel-content-left"]/div[2]/span[20]').click()

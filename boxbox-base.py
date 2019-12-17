@@ -44,13 +44,13 @@ class Connect(object):
         response = self.opener.open(login)
         response.close()
 
-    def reqbase(self,nexta,limit):
+    def reqbase(self,nexta,limit,startstr,endstr):
         offset=nexta
         limit=limit
         dataformat = {
             "offset": offset,
-            "dueDateFrom": "2019-10-05",
-            "dueDateTo" : "2019-11-04",
+            "dueDateFrom": startstr,
+            "dueDateTo" : endstr,
             "limit": limit
         }
         data = urllib.parse.urlencode(dataformat)
@@ -101,6 +101,8 @@ if __name__ == '__main__':
     else:
         userdataf['mobile'] = input('输入用户名： ')
         userdataf['password'] = input('输入密码： ')
+    startstr = input('输入开始日期： ')
+    endstr = input('输入结束日期： ')
     basereq.loginaction(userdataf)
     filename=userdataf['mobile']+ '-' + now.strftime(format) + '.csv'
     with open(filename, 'w') as f:
@@ -110,9 +112,9 @@ if __name__ == '__main__':
         writer.writeheader()
     # basereq.headers['Cookie'] = sys.argv[1]
 
-    baseinfo = basereq.reqbase(0, 10,)
+    baseinfo = basereq.reqbase(0, 10,startstr,endstr)
     offset = baseinfo['offset'] + 10
     totalCount = baseinfo['totalCount']
     while offset <= totalCount:
-        baseinfo = basereq.reqbase(offset, 100,)
+        baseinfo = basereq.reqbase(offset, 100,startstr,endstr)
         offset = offset + 100
